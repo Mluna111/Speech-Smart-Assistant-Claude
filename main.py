@@ -4,8 +4,10 @@ import anthropic
 # Import the required module for text
 # to speech conversion
 from gtts import gTTS
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 language = 'en-us'
 
 
@@ -25,7 +27,7 @@ try:
 
     client = anthropic.Anthropic(
         # defaults to os.environ.get("ANTHROPIC_API_KEY")
-        api_key="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",
+        api_key=os.getenv("ANTHROPIC_API"),
     )
 
     message = client.messages.create(
@@ -50,4 +52,6 @@ except sr.UnknownValueError:
     print("Could not understand audio")
 except sr.RequestError as e:
     print("Could not request results; {0}".format(e))
+
+
 
