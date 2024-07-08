@@ -1,21 +1,3 @@
-# import speech_recognition as sr
-# # Create a recognizer instance
-# r = sr.Recognizer()
-# # Path to your audio file (update this to your actual audio file's path)
-# audio_file_path = "voice.wav"
-# # Use the AudioFile class to work with the pre-recorded audio file
-# with sr.AudioFile(audio_file_path) as source:
-#     # Listen to the audio file
-#     audio_data = r.record(source)
-#     try:
-#         # Use Google Speech Recognition
-#         text = r.recognize_google(audio_data)
-#         print("Recognized text:", text)
-#     except sr.UnknownValueError:
-#         print("Google Speech Recognition could not understand audio")
-#     except sr.RequestError as e:
-#         print("Could not request results from Google Speech Recognition service; {0}".format(e))
-
 
 import speech_recognition as sr
 import anthropic
@@ -24,30 +6,22 @@ import anthropic
 from gtts import gTTS
 import os
 
-language = 'en'
+language = 'en-us'
 
 
 # Create a recognizer instance
 r = sr.Recognizer()
-
-# # Create a recognizer instance
-# audio_file_path = "voice.wav"
-# # Use the AudioFile class to work with the pre-recorded audio file
-# with sr.AudioFile(audio_file_path) as source:
-#     # Listen to the audio file
-#     audio_data = r.record(source)
 
 #Use the default microphone as the audio source
 with sr.Microphone() as source:
     print("Say something...")
     audio = r.listen(source)
 
-
 try:
     # Use Google Speech Recognition
     text = r.recognize_google(audio)
     print("You said:", text)
-
+    text = "Answer the questions in 90 words or less: " + text
 
     client = anthropic.Anthropic(
         # defaults to os.environ.get("ANTHROPIC_API_KEY")
@@ -55,12 +29,15 @@ try:
     )
 
     message = client.messages.create(
-        model="claude-3-opus-20240229",
-        max_tokens=1000,
+        #model="claude-3-opus-20240229",
+        model="claude-3-haiku-20240307",
+        max_tokens=200,
         temperature=0,
         messages=[{"role": "user", "content": text}]
     )
     print(message.content[0].text)
+
+    #system(message.content[0].text)
 
     myobj = gTTS(text=message.content[0].text, lang=language, slow=False)
 
@@ -73,7 +50,4 @@ except sr.UnknownValueError:
     print("Could not understand audio")
 except sr.RequestError as e:
     print("Could not request results; {0}".format(e))
-
-
-
 
